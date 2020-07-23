@@ -42,7 +42,51 @@
 </template>
 
 <script>
+import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
 export default {
+  setup(props, context) {
+    console.log(context);
+    const arr = reactive(["1", "2", "3"]); //声明对象类型
+    const name = ref("hkx"); //声明基础类型
+    const password = ref("111"); 
+    const checked = ref(false); 
+    const errorText = ref(""); 
+    const passwordType = ref("password"); 
+    // 生命周期
+    onMounted(() => {});
+    //声明函数
+    const login = (() => {
+      if (!name.value) {
+        errorText.value = "用户名不能为空！";
+        return;
+      } else if (!password.value) {
+        errorText.value = "密码不能为空！";
+        return;
+      }
+      let data = {};
+      data.loginName = name.value;
+      data.password = password.value;
+      data.iden = checked.value ? 1 : 0;
+      sessionStorage.clear();
+      console.log(context.root);
+      context.root.$router.push({
+        name:'layout'
+      });
+    })
+    const showPassword = (()=>{
+      passwordType.value = passwordType.value === "text" ? "password" : "text";
+    })
+
+    return {
+      name,
+      password,
+      checked,
+      errorText,
+      passwordType,
+      login,
+      showPassword
+    }
+  },
   name: "login",
   data() {
     return {
@@ -53,27 +97,6 @@ export default {
       passwordType: "password"
     };
   },
-  methods: {
-    login() {
-      if (!this.name) {
-        this.errorText = "用户名不能为空！";
-        return;
-      } else if (!this.password) {
-        this.errorText = "密码不能为空！";
-        return;
-      }
-      let $this = this;
-      let data = {};
-      data.loginName = this.name;
-      data.password = this.password;
-      data.iden = this.checked ? 1 : 0;
-      sessionStorage.clear()
-      this.$router.push("/projectMange/projectInfo")
-    },
-    showPassword() {
-      this.passwordType = this.passwordType === "text" ? "password" : "text";
-    }
-  }
 };
 </script>
 
