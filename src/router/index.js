@@ -17,7 +17,6 @@ import addTask from "@/views/synchronization/addTask"
 import dateSource from "@/views/synchronization/dateSource"
 import meanwhile from "@/views/synchronization/meanwhile"
 
-
 //解决路由重复点击报错
 const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {  

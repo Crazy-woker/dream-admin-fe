@@ -42,40 +42,43 @@
 </template>
 
 <script>
+import { getSms } from "@/api/login";
 import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
 export default {
   setup(props, context) {
     console.log(context);
     const arr = reactive(["1", "2", "3"]); //声明对象类型
     const name = ref("hkx"); //声明基础类型
-    const password = ref("111"); 
-    const checked = ref(false); 
-    const errorText = ref(""); 
-    const passwordType = ref("password"); 
+    const password = ref("111");
+    const checked = ref(false);
+    const errorText = ref("");
+    const passwordType = ref("password");
     // 生命周期
-    onMounted(() => {});
+    onMounted(() => {
+      getSms();
+    });
     //声明函数
-    const login = (() => {
-      if (!name.value) {
-        errorText.value = "用户名不能为空！";
-        return;
-      } else if (!password.value) {
-        errorText.value = "密码不能为空！";
-        return;
-      }
-      let data = {};
-      data.loginName = name.value;
-      data.password = password.value;
-      data.iden = checked.value ? 1 : 0;
-      sessionStorage.clear();
-      console.log(context.root);
+    const login = () => {
+      // if (!name.value) {
+      //   errorText.value = "用户名不能为空！";
+      //   return;
+      // } else if (!password.value) {
+      //   errorText.value = "密码不能为空！";
+      //   return;
+      // }
+      // let data = {};
+      // data.loginName = name.value;
+      // data.password = password.value;
+      // data.iden = checked.value ? 1 : 0;
+      // sessionStorage.clear();
+      context.root.$store.dispatch("app/login",{userName:"hkx",token:"1121do01ked10ed190"})
       context.root.$router.push({
-        name:'layout'
+        name: "layout"
       });
-    })
-    const showPassword = (()=>{
+    };
+    const showPassword = () => {
       passwordType.value = passwordType.value === "text" ? "password" : "text";
-    })
+    };
 
     return {
       name,
@@ -85,7 +88,7 @@ export default {
       passwordType,
       login,
       showPassword
-    }
+    };
   },
   name: "login",
   data() {
@@ -96,7 +99,7 @@ export default {
       errorText: "",
       passwordType: "password"
     };
-  },
+  }
 };
 </script>
 

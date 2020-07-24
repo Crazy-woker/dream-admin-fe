@@ -25,7 +25,7 @@
           <!-- <img style="width:40px;height:40px;border-radius: 20px;vertical-align: middle;margin-left: 10px;" :src="profileUrl" alt=""> -->
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command='退出登录'>退出登录</el-dropdown-item>
+          <el-dropdown-item command='退出登录' @click="exit">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
@@ -97,7 +97,11 @@ export default {
       });
       this.$router.push(`${this.leftNav[0].menuItems[0].path}`);
     },
-    selectDropdown() {}
+    selectDropdown() {},
+    //退出登录
+    exit(){
+      this.$store.dispatch("app/exit")
+    }
   }
 };
 </script>
