@@ -2,9 +2,12 @@ import { setToken, setUserName, removeToken } from "@/utils/app"
 import Cookie from "cookie_js"
 const state = {
     token: "",
-    userName: ""
-}
+    userName: "",
 
+}
+const getters = {
+
+}
 const actions = {
     login({ commit }, requestData) {
         let data = requestData
@@ -27,9 +30,7 @@ const mutations = {
         state.userName = value
     }
 }
-const getters = {
 
-}
 
 export default {
     namespaced: true,

@@ -13,7 +13,20 @@ router.beforeEach((to, from, next) => {
             sessionStorage.clear();
             next()
         } else {
-            next()
+            if (store.getters["permission/roles"].length === 0) {
+                store.dispatch("permission/getRoles").then((res) => {
+                    // console.log(res);
+                    let role = res
+                    store.dispatch("permission/createRouter", role).then((res) => {
+                        let addRouters = store.getters["permission/addRouters"]
+                        router.addRoutes(addRouters)
+                        next({...to, replace: true })
+                    })
+                })
+            } else {
+                next()
+            }
+            // next()
         }
     } else {
         if (whiteRouter.indexOf(to.path) !== -1) {

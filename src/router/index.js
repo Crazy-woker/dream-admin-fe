@@ -25,7 +25,10 @@ VueRouter.prototype.push = function push(location) {  
 
 Vue.use(VueRouter)
 
-const routes = [{
+
+
+//默认路由
+export const defultRouterMap = [{
         path: '/',
         redirect: 'login'
     },
@@ -70,38 +73,56 @@ const routes = [{
                 component: jurisdiction
             },
             {
+                meta: {
+                    system: "admin"
+                },
                 path: '/projectMange/allTenant',
                 name: 'allTenant',
                 component: allTenant
             },
             {
+                meta: {
+                    system: "nomal"
+                },
                 path: '/projectMange/myTenant',
                 name: 'myTenant',
                 component: myTenant
             },
-            {
-                path: '/synchronization/addTask',
-                name: 'addTask',
-                component: addTask
-            },
-            {
-                path: '/synchronization/dateSource',
-                name: 'dateSource',
-                component: dateSource
-            },
-            {
-                path: '/synchronization/meanwhile',
-                name: 'meanwhile',
-                component: meanwhile
-            },
-
         ]
     },
 
 ]
 
+
+//动态路由
+export const asyncRouterMap = [{
+        meta: {
+            system: "admin"
+        },
+        path: '/synchronization/addTask',
+        name: 'addTask',
+        component: addTask
+    },
+    {
+        meta: {
+            system: "admin"
+        },
+        path: '/synchronization/dateSource',
+        name: 'dateSource',
+        component: dateSource
+    },
+    {
+        meta: {
+            system: "nomal"
+        },
+        path: '/synchronization/meanwhile',
+        name: 'meanwhile',
+        component: meanwhile
+    },
+]
+
 const router = new VueRouter({
-    routes
+    routes: defultRouterMap
 })
 
 export default router
