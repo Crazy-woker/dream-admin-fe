@@ -5,28 +5,30 @@ import store from "../store/index"
 //路由守卫
 const whiteRouter = ['/login']
 router.beforeEach((to, from, next) => {
-    console.log(to);
     if (getToken()) {
         if (to.path === "/login") {
-            removeToken()
-            store.commit("SEND_TOKEN", "")
+            store.dispatch("app/exit")
             sessionStorage.clear();
             next()
         } else {
-            if (store.getters["permission/roles"].length === 0) {
+            if (store.getters["app/roles"].length === 0) {
                 store.dispatch("permission/getRoles").then((res) => {
-                    // console.log(res);
                     let role = res
+                    store.commit("app/SET_ROLES", role)
                     store.dispatch("permission/createRouter", role).then((res) => {
                         let addRouters = store.getters["permission/addRouters"]
+                        let allRouters = store.getters["permission/allRouters"]
+                            //更新所有路由
+                        router.options.routes = allRouters
+                            //添加动态路由
                         router.addRoutes(addRouters)
+                            //replace: true 不留路由记录
                         next({...to, replace: true })
                     })
                 })
             } else {
                 next()
             }
-            // next()
         }
     } else {
         if (whiteRouter.indexOf(to.path) !== -1) {

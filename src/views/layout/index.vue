@@ -1,12 +1,8 @@
 <template>
   <div id="layout">
-    <menuHeader @leftdata="leftdata"></menuHeader>
+    <menuHeader @changeName="changeName"></menuHeader>
     <menuMain></menuMain>
-    <menuNav
-      :leftDataNav="leftNav"
-      :leftDataName="leftName"
-      :slideName="slideName"
-    ></menuNav>
+    <menuNav :menuName="menuName"></menuNav>
   </div>
 </template>
 
@@ -19,23 +15,19 @@ export default {
   components: {
     menuHeader,
     menuNav,
-    menuMain
+    menuMain,
   },
   name: "layout",
   data() {
     return {
-      leftNav: [],
-      leftName: "",
-      slideName: ""
+      menuName:""
     };
   },
   methods: {
-    leftdata(val) {
-      this.leftNav = val.leftNav;
-      this.leftName = val.leftName;
-      this.slideName = val.slideName;
-    }
-  }
+    changeName(val) {
+      this.menuName = val
+    },
+  },
 };
 </script>
 

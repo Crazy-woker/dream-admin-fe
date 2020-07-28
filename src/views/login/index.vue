@@ -46,7 +46,6 @@ import { getSms } from "@/api/login";
 import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
 export default {
   setup(props, context) {
-    console.log(context);
     const arr = reactive(["1", "2", "3"]); //声明对象类型
     const name = ref("hkx"); //声明基础类型
     const password = ref("111");
@@ -73,7 +72,7 @@ export default {
       // sessionStorage.clear();
       context.root.$store.dispatch("app/login",{userName:"hkx",token:"1121do01ked10ed190"})
       context.root.$router.push({
-        name: "layout"
+        name: "console"
       });
     };
     const showPassword = () => {
@@ -91,15 +90,6 @@ export default {
     };
   },
   name: "login",
-  data() {
-    return {
-      name: "hkx",
-      password: "111",
-      checked: false,
-      errorText: "",
-      passwordType: "password"
-    };
-  }
 };
 </script>
 

@@ -2,45 +2,65 @@
   <div id="nav-wrap">
     <el-col :class="{isShow:!isLeftShow}">
       <el-menu
-        :default-active="slideActiveName"
+        :default-active="activeMenu"
         class="el-menu-vertical-demo"
         @open="handleOpen"
         @close="handleClose"
         @select="selectLeftMenu"
         :default-openeds="openeds"
         :unique-opened="true"
+        router
       >
-
-        <div
-          v-for="(item,index) in leftNav"
-          :key="index"
-        >
-          <el-submenu
-            :index="item.name"
-            v-if="item.type"
+        <template v-for="(item,index) in routes">
+          <div
+            :key="index"
+            v-if="!item.hidden"
           >
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>{{item.name}}</span>
-            </template>
-            <el-menu-item-group>
-              <el-menu-item
-                v-for="(child,childI) in item.menuItems"
-                :key="childI"
-                :index="child.name"
+            <template>
+              <div
+                v-for="(child, childIndex) in item.children"
+                :key="childIndex"
               >
-                {{child.name}}
-              </el-menu-item>
-            </el-menu-item-group>
-          </el-submenu>
-          <el-menu-item
-            :index="item.name"
-            v-if="!item.type"
-          >
-            <i class="el-icon-menu"></i>
-            <span slot="title">{{item.name}}</span>
-          </el-menu-item>
-        </div>
+                <el-submenu
+                  :index="child.path"
+                  v-if="!child.singleType"
+                >
+                  <template slot="title">
+                    <i class="el-icon-location"></i>
+                    <span>{{child.meta.name}}</span>
+                  </template>
+                  <el-menu-item-group>
+                    <template v-for="(childItem,childItemIndex) in child.children">
+                      <el-menu-item
+                        v-if="!child.isSilderShow"
+                        :key="childItemIndex"
+                        :index="childItem.meta.apiActiveMenu"
+                      >
+                        {{childItem.meta.name}}
+                      </el-menu-item>
+                    </template>
+                  </el-menu-item-group>
+                </el-submenu>
+              </div>
+            </template>
+
+            <template>
+              <div
+                v-for="(child) in item.children"
+                :key="child.name"
+              >
+                <el-menu-item
+                  :index="child.meta.apiActiveMenu"
+                  v-if="child.singleType && child.isSilderShow"
+                >
+                  <i class="el-icon-menu"></i>
+                  <span slot="title">{{child.meta.name}}</span>
+                </el-menu-item>
+              </div>
+            </template>
+
+          </div>
+        </template>
 
       </el-menu>
     </el-col>
@@ -48,100 +68,60 @@
 </template>
 
 <script>
-import Vue from "vue";
-import { getNav } from "@/utils/nav.js";
 export default {
-  props: ["leftDataNav", "leftDataName", "slideName"],
+  props: ["menuName"],
   data() {
     return {
-      topNav: [],
-      //显示顶部栏的高亮状态
       topActiveName: "",
       //显示侧边栏的高亮状态
       slideActiveName: "",
-      leftNav: [],
-      isCollapse: false,
-      isSideShow: [],
-      //展开导航栏的数组
-      openeds: [],
-      isLogin: false,
+      openeds: ["/projectConfig"],
       isLeftShow: true,
+      routes: [],
     };
   },
   mounted() {
+    // 页面手动刷新指定路由
     this.getLeftMenu();
   },
-
+  computed: {
+    // 我们使用计算属性来获取到当前点击的菜单的路由路径，然后设置default-active中的值
+    // 使得菜单在载入时就能对应高亮
+    activeMenu() {
+      const route = this.$route;
+      const { meta, path } = route;
+      // if set path, the sidebar will highlight the path you set
+      // 可以在路由配置文件中设置自定义的路由路径到meta.activeMenu属性中，来控制菜单自定义高亮显示
+      if (meta.apiActiveMenu) {
+        // 注意这里很重要
+        return meta.apiActiveMenu;
+      }
+      return path;
+    },
+  },
   watch: {
-    slideName(newVal, oldVal) {
-        this.slideActiveName = newVal
+    menuName(newVal, oldVal) {
+      this.getLeftMenu();
     },
-    leftDataName: {
-      //深度监听，可监听到对象、数组的变化
-      handler(newVal, oldVal) {
-        this.openeds = newVal;
-      },
-      deep: true //true 深度监听
-    },
-    leftDataNav: {
-      //深度监听，可监听到对象、数组的变化
-      handler(newVal, oldVal) {
-        this.leftNav = newVal;
-      },
-      deep: true //true 深度监听
-    }
   },
   methods: {
-    //获取侧边栏信息
+    //获取侧边栏
     getLeftMenu() {
-      let nav = getNav();
-      let leftName = sessionStorage.getItem("leftName");
-      let leftItemName = sessionStorage.getItem("leftItemName");
-      let leftNavName = sessionStorage.getItem("leftNavName")
-        ? sessionStorage.getItem("leftNavName")
-        : null;
-      console.log(nav);
-      if (leftNavName) {
-        this.openeds = JSON.parse(leftName);
-        this.slideActiveName = leftItemName;
-        this.leftNav = nav.leftNav[leftNavName];
-      } else {
-        this.leftNav = nav.leftNav.projectMange;
-        this.openeds = [`${this.leftNav[0].name}`];
-      }
+      let routes = this.$router.options.routes;
+      let routerInfo = [];
+      let routerName = sessionStorage.getItem("routerName") || "projectMange";
+      //过滤出所有可以显示的路由
+      routerInfo = routes.filter((item) => {
+        return item.hidden == false && item.name == routerName;
+      });
+      this.routes = routerInfo;
     },
     //选择侧边栏
-    selectLeftMenu(key, keyPath) {
-      sessionStorage.setItem("leftItemName", key);
-      sessionStorage.setItem("leftName", JSON.stringify(this.isSideShow));
-      let thisMenu = this.leftNav.filter(item => {
-        return item.name === keyPath[0];
-      });
-      let selectObj = thisMenu[0].menuItems.filter(item => {
-        return item.name == key;
-      });
-      if (selectObj.length == 0) {
-        thisMenu[0].menuItems.forEach(element => {
-          if (element.menuItems) {
-            element.menuItems.forEach(element => {
-              if (element.name == key) {
-                selectObj.push(element);
-              }
-            });
-          }
-        });
-      }
-        this.$router.push(selectObj[0].path);
-    },
+    selectLeftMenu(key, keyPath) {},
     //控制菜单显示隐藏
-    handleOpen(key, keyPath) {
-      console.log(key, keyPath);
-      this.isSideShow = keyPath;
-    },
-    handleClose(key, keyPath) {
-      this.isSideShow = keyPath;
-    }
-  }
+    handleOpen(key, keyPath) {},
+    handleClose(key, keyPath) {},
+  },
 };
 </script>
 
